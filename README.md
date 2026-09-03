@@ -1,6 +1,6 @@
 # 猫猫六级
 
-一个以橘猫为主题的六级词汇学习网页。直接双击 `index.html` 即可使用，不需要安装依赖或启动服务器。
+一个以瑞幸联名猫猫为主题的六级词汇学习网页。点击 https://github.com/FLYINGHUSKY/MEOW-WORDS 即可使用，不需要安装依赖或启动服务器。
 
 ## 功能
 
@@ -22,7 +22,7 @@
 
 ## 使用
 
-1. 用 Edge、Chrome 或其他现代浏览器打开 `index.html`。
+1. 用 Edge、Chrome 或其他现代浏览器打开 https://github.com/FLYINGHUSKY/MEOW-WORDS。
 2. 点击“开始今日学习”。
 3. 先回忆词义，再翻卡并按真实记忆情况评分。
 4. 下次打开网页时，系统会自动找出到期单词。
