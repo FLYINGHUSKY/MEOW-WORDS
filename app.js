@@ -73,11 +73,14 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 
 function defaultState() {
-  return { dailyGoal: 10, progress: {}, activity: {}, totalReviews: 0, createdAt: Date.now() };
+  return { dailyGoal: 10, progress: {}, activity: {}, totalReviews: 0, createdAt: Date.now(), updatedAt: Date.now() };
 }
 
-function loadState() {
-  try { return {...defaultState(), ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')}; }
+let activeStorageKey = STORAGE_KEY;
+let activeStorageScope = 'guest';
+
+function loadState(storageKey = activeStorageKey) {
+  try { return {...defaultState(), ...JSON.parse(localStorage.getItem(storageKey) || '{}')}; }
   catch { return defaultState(); }
 }
 
@@ -92,7 +95,11 @@ let tempGoal = state.dailyGoal;
 const dateKey = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 const startOfDay = (date = new Date()) => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 const addDays = (days) => startOfDay() + days * DAY + 9 * 3600000;
-const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+const saveState = () => {
+  state.updatedAt = Date.now();
+  localStorage.setItem(activeStorageKey, JSON.stringify(state));
+  window.dispatchEvent(new CustomEvent('meow:state-saved', {detail: {scope: activeStorageScope, state: structuredClone(state)}}));
+};
 const getProgress = (id) => state.progress[id];
 const getStatus = (id) => !getProgress(id) ? 'new' : getProgress(id).level >= 4 ? 'mastered' : 'learning';
 const learnedWords = () => WORDS.filter(w => getProgress(w.id));
@@ -301,6 +308,23 @@ function renderStats() {
 }
 
 function renderAll() { renderDashboard(); renderLibrary(); renderStats(); }
+
+window.MeowApp = {
+  getState: () => structuredClone(state),
+  getScope: () => activeStorageScope,
+  readStateForScope(scope = 'guest') {
+    const storageKey = scope === 'guest' ? STORAGE_KEY : `${STORAGE_KEY}:user:${scope}`;
+    return loadState(storageKey);
+  },
+  activateStorageScope(scope = 'guest', nextState) {
+    activeStorageScope = scope;
+    activeStorageKey = scope === 'guest' ? STORAGE_KEY : `${STORAGE_KEY}:user:${scope}`;
+    state = nextState ? {...defaultState(), ...structuredClone(nextState)} : loadState(activeStorageKey);
+    tempGoal = state.dailyGoal;
+    localStorage.setItem(activeStorageKey, JSON.stringify(state));
+    renderAll();
+  }
+};
 
 function switchView(name) {
   $$('.view').forEach(v => v.classList.toggle('active', v.dataset.viewPanel === name));

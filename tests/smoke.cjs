@@ -17,6 +17,25 @@ const path = require('path');
 
   if (!(await page.locator('#dashboardView').isVisible())) throw new Error('Dashboard is not visible');
   if (!(await page.locator('.sidebar .brand b').textContent()).includes('猫猫六级')) throw new Error('Brand name was not updated');
+  if ((await page.locator('.brand-mark img[src="assets/cat-avatar.jpg"]').count()) !== 2) throw new Error('Cat avatar brand mark is missing');
+  if ((await page.locator('#profileName').textContent()).trim() !== '游客同学') throw new Error('Guest mode is not active by default');
+  await page.locator('#authButton').click();
+  if (!(await page.locator('#authDialog').isVisible())) throw new Error('Guest account dialog is missing');
+  const authConfigured = await page.evaluate(() => window.MeowAuth.isConfigured);
+  if ((await page.locator('#authForm').isVisible()) !== authConfigured) throw new Error('Login form visibility does not match Supabase configuration');
+  if ((await page.locator('#authSetup').isVisible()) === authConfigured) throw new Error('Setup notice visibility does not match Supabase configuration');
+  if (await page.locator('#accountPanel').isVisible()) throw new Error('Account panel should be hidden for guests');
+  await page.screenshot({ path: path.resolve('tests', 'auth-guest.png'), fullPage: false });
+  await page.locator('#continueGuestBtn').click();
+  if ((await page.evaluate(() => window.MeowApp.getScope())) !== 'guest') throw new Error('Guest storage scope is incorrect');
+  const storageIsolation = await page.evaluate(() => {
+    const guestGoal = window.MeowApp.getState().dailyGoal;
+    window.MeowApp.activateStorageScope('smoke-user', {...window.MeowApp.getState(), dailyGoal: 17});
+    const userGoal = window.MeowApp.getState().dailyGoal;
+    window.MeowApp.activateStorageScope('guest');
+    return {guestGoal, userGoal, restoredGuestGoal: window.MeowApp.getState().dailyGoal};
+  });
+  if (storageIsolation.userGoal !== 17 || storageIsolation.restoredGuestGoal !== storageIsolation.guestGoal) throw new Error('Guest and account storage are not isolated');
   if ((await page.locator('.side-cat-card').count()) !== 0) throw new Error('Sidebar cat card was not removed');
   const dailyBackgrounds = await page.evaluate(() => {
     const sidebar = document.querySelector('.sidebar');

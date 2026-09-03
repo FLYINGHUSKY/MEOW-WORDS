@@ -26,7 +26,7 @@
   <div class="app-shell">
     <aside class="sidebar" aria-label="主导航">
       <a class="brand" href="#dashboard" aria-label="猫猫六级首页">
-        <span class="brand-mark"><span>ฅ</span></span>
+        <span class="brand-mark"><img src="assets/cat-avatar.jpg" alt=""></span>
         <span><b>猫猫六级</b><small>MEOW WORDS</small></span>
       </a>
 
@@ -39,15 +39,16 @@
 
       <div class="sidebar-bottom">
         <button class="nav-item" id="settingsBtn"><svg><use href="#i-settings"/></svg><span>学习设置</span></button>
-        <div class="profile">
+        <button class="profile" id="authButton" type="button" aria-haspopup="dialog">
           <img src="assets/cat-avatar.jpg" alt="橘猫头像">
-          <span><b>铲屎官同学</b><small id="profileLevel">初来乍到</small></span>
-        </div>
+          <span><b id="profileName">游客同学</b><small id="profileLevel">初来乍到</small></span>
+          <i class="account-status" id="accountStatus" aria-hidden="true"></i>
+        </button>
       </div>
     </aside>
 
     <header class="mobile-header">
-      <a class="brand" href="#dashboard"><span class="brand-mark"><span>ฅ</span></span><b>猫猫六级</b></a>
+      <a class="brand" href="#dashboard"><span class="brand-mark"><img src="assets/cat-avatar.jpg" alt=""></span><b>猫猫六级</b></a>
       <button id="mobileMenuBtn" aria-label="打开菜单" aria-expanded="false"><span></span><span></span><span></span></button>
     </header>
 
@@ -176,8 +177,49 @@
     </form>
   </dialog>
 
+  <dialog id="authDialog" class="auth-dialog">
+    <button class="auth-close" id="authCloseBtn" type="button" aria-label="关闭登录窗口"><svg><use href="#i-close"/></svg></button>
+    <div class="auth-visual">
+      <img src="assets/cat-avatar.jpg" alt="橘猫头像">
+      <span>学习记录也要有自己的小窝喵～</span>
+    </div>
+    <div class="auth-content">
+      <p class="eyebrow">MEOW ACCOUNT</p>
+      <h2 id="authTitle">登录猫猫账号</h2>
+      <p class="auth-subtitle" id="authSubtitle">登录后可在不同设备继续学习，游客也能直接使用。</p>
+
+      <div class="auth-setup" id="authSetup" hidden>
+        <b>登录服务尚未启用</b>
+        <p>管理员完成 Supabase 配置后，即可开放注册和云端同步。当前仍可使用游客模式。</p>
+      </div>
+
+      <form id="authForm" novalidate>
+        <div class="auth-tabs" role="tablist" aria-label="账号操作">
+          <button class="active" type="button" data-auth-mode="login" role="tab" aria-selected="true">登录</button>
+          <button type="button" data-auth-mode="register" role="tab" aria-selected="false">注册</button>
+        </div>
+        <label>用户名<input id="authUsername" name="username" autocomplete="username" minlength="2" maxlength="20" placeholder="2～20 个中文、字母或数字" required></label>
+        <label>密码<input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="72" placeholder="至少 8 位" required></label>
+        <label id="confirmPasswordRow" hidden>确认密码<input id="authPasswordConfirm" name="passwordConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="72" placeholder="再次输入密码"></label>
+        <p class="auth-warning" id="authWarning" hidden>该账号不绑定邮箱，忘记密码后无法自行找回。</p>
+        <p class="auth-error" id="authError" role="alert"></p>
+        <button class="primary-btn auth-submit" id="authSubmitBtn" type="submit">登录</button>
+      </form>
+
+      <section class="account-panel" id="accountPanel" hidden>
+        <span class="account-avatar"><img src="assets/cat-avatar.jpg" alt=""><i></i></span>
+        <div><small>当前账号</small><b id="accountUsername">—</b><p id="syncStatus">学习记录已同步</p></div>
+        <button id="logoutBtn" type="button">退出登录</button>
+      </section>
+
+      <button class="guest-btn" id="continueGuestBtn" type="button">继续以游客身份使用</button>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><p>已保存</p></div>
   <script src="data/cet6-vocabulary.js"></script>
   <script src="app.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
 </body>
 </html>
