@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6aa52">
+  <meta name="description" content="猫猫六级——基于艾宾浩斯遗忘曲线的可爱六级词汇学习网页">
+  <title>猫猫六级 · 每天记一点</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 10h7M7 14h4"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5z"/><path d="M4 6.5v13A1.5 1.5 0 0 0 5.5 21H20"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4zM15 9a5 5 0 0 1 0 6M18 6a9 9 0 0 1 0 12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></symbol>
+    <symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.8 7-7.2 0-3.2-1.8-5.6-4.6-8.3.1 2.1-1.1 3.4-2.2 4.2.2-3.4-1.7-6.3-4-8.7.1 3.9-3.2 6-3.2 10.5C5 18 8 22 12 22z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+      <a class="brand" href="#dashboard" aria-label="猫猫六级首页">
+        <span class="brand-mark"><span>ฅ</span></span>
+        <span><b>猫猫六级</b><small>MEOW WORDS</small></span>
+      </a>
+
+      <nav class="side-nav">
+        <button class="nav-item active" data-view="dashboard"><svg><use href="#i-home"/></svg><span>今日学习</span></button>
+        <button class="nav-item" data-view="study"><svg><use href="#i-card"/></svg><span>单词卡片</span><em id="reviewBadge">0</em></button>
+        <button class="nav-item" data-view="library"><svg><use href="#i-book"/></svg><span>我的词库</span></button>
+        <button class="nav-item" data-view="stats"><svg><use href="#i-chart"/></svg><span>学习统计</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="nav-item" id="settingsBtn"><svg><use href="#i-settings"/></svg><span>学习设置</span></button>
+        <div class="profile">
+          <img src="assets/cat-avatar.jpg" alt="橘猫头像">
+          <span><b>铲屎官同学</b><small id="profileLevel">初来乍到</small></span>
+        </div>
+      </div>
+    </aside>
+
+    <header class="mobile-header">
+      <a class="brand" href="#dashboard"><span class="brand-mark"><span>ฅ</span></span><b>猫猫六级</b></a>
+      <button id="mobileMenuBtn" aria-label="打开菜单" aria-expanded="false"><span></span><span></span><span></span></button>
+    </header>
+
+    <main class="main-content">
+      <section class="view active" id="dashboardView" data-view-panel="dashboard">
+        <div class="dashboard-actions">
+          <div class="streak-pill"><span class="icon-circle"><svg><use href="#i-fire"/></svg></span><span>连续学习<b id="streakCount">0 天</b></span></div>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="hero-card">
+            <div class="hero-copy">
+              <span class="soft-tag"><i></i> 今日学习计划</span>
+              <h2>今天也要元气满满<br>地背单词呀！</h2>
+              <p>根据你的记忆曲线，今日需要完成</p>
+              <div class="task-counts">
+                <span><b id="newCount">10</b><small>新单词</small></span>
+                <i></i>
+                <span><b id="dueCount">0</b><small>待复习</small></span>
+              </div>
+              <button class="primary-btn" id="startStudyBtn">开始今日学习 <svg><use href="#i-arrow"/></svg></button>
+              <small class="time-hint">约需 <b id="estimateTime">8</b> 分钟 · 加油，你可以的！</small>
+            </div>
+            <div class="hero-visual">
+              <span class="cat-speech">Ready？<br>出发喵！</span>
+              <span class="spark s1">✦</span><span class="spark s2">✦</span><span class="spark s3">●</span>
+              <div class="cat-halo"></div>
+              <img src="assets/cat-study.jpg" alt="认真学习的橘猫">
+              <div class="tiny-card card-one">abandon <span>已掌握</span></div>
+              <div class="tiny-card card-two">persist <span>坚持</span></div>
+            </div>
+          </article>
+
+          <article class="progress-card card-surface">
+            <div class="section-title"><span><i class="title-dot coral"></i><b>今日进度</b></span><em id="progressFraction">0 / 10</em></div>
+            <div class="progress-wrap">
+              <div class="progress-ring" id="progressRing"><div><b id="progressPercent">0%</b><small>完成度</small></div></div>
+              <div class="progress-copy"><h3 id="progressTitle">今天还没有开始</h3><p id="progressMessage">迈出第一步，喵老师会一直陪着你。</p><div class="goal-bar"><span id="goalBar"></span></div><small>今日目标 <b id="goalText">10 个</b></small></div>
+            </div>
+            <div class="encourage"><img src="assets/cat-orange.jpg" alt="橘子帽猫咪"><span><b id="encourageTitle">先学一个试试！</b><small id="encourageText">开始比完美更重要喵～</small></span></div>
+          </article>
+
+          <article class="week-card card-surface">
+            <div class="section-title"><span><i class="title-dot yellow"></i><b>本周打卡</b></span><em><b id="weekDays">0</b> / 7 天</em></div>
+            <div class="week-grid" id="weekGrid"></div>
+            <div class="week-summary"><span><b id="weeklyWords">0</b><small>本周学习</small></span><i></i><span><b id="masteredWords">0</b><small>已掌握</small></span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="studyView" data-view-panel="study">
+        <div class="study-topbar">
+          <button class="back-btn" data-go="dashboard">← 返回今日学习</button>
+          <div class="session-progress"><span><i id="sessionBar"></i></span><b id="sessionCounter">0 / 0</b></div>
+          <span class="shortcut-hint">空格翻卡 · 1 / 2 / 3 选择</span>
+        </div>
+        <div class="study-stage" id="studyStage">
+          <div class="study-empty" id="studyEmpty">
+            <img src="assets/cat-rest.jpg" alt="敷面膜休息的猫咪">
+            <h2>今天的任务完成啦！</h2>
+            <p>休息一下，明天记得回来复习喵。</p>
+            <button class="primary-btn" data-go="dashboard">看看学习成果</button>
+          </div>
+          <article class="word-card" id="wordCard">
+            <div class="card-topline"><span class="word-tag" id="wordTag">NEW WORD</span><button class="sound-btn" id="speakBtn" aria-label="朗读单词"><svg><use href="#i-sound"/></svg><span>发音</span></button></div>
+            <div class="word-main">
+              <p class="phonetic" id="phonetic">/ˈæbəndən/</p>
+              <h2 id="wordText">abandon</h2>
+              <p class="word-pos" id="wordPos">v.</p>
+            </div>
+            <button class="reveal-btn" id="revealBtn">查看释义 <span>SPACE</span></button>
+            <div class="answer-panel" id="answerPanel">
+              <div class="meaning-row"><span>中文释义</span><h3 id="wordMeaning">放弃；抛弃</h3></div>
+              <div class="memory-note"><span>ฅ</span><p><b>喵记一下</b><span id="wordNote">a + band（绑）+ on → 不再绑住 → 放弃</span></p></div>
+              <div class="example-box"><span>例句</span><p id="wordExample">They had to abandon the plan because of a lack of funds.</p><small id="wordTranslation">由于缺乏资金，他们不得不放弃这项计划。</small><button id="exampleSpeakBtn" aria-label="朗读例句"><svg><use href="#i-sound"/></svg></button></div>
+            </div>
+            <div class="rating-panel" id="ratingPanel">
+              <p>这个单词记得怎么样？</p>
+              <div>
+                <button class="rating again" data-rating="again"><b>1</b><span>忘记了<small>本轮再复习</small></span></button>
+                <button class="rating fuzzy" data-rating="fuzzy"><b>2</b><span>有点模糊<small>明天再见</small></span></button>
+                <button class="rating know" data-rating="know"><b>3</b><span>记住了<small id="nextInterval">1 天后</small></span></button>
+              </div>
+            </div>
+          </article>
+          <img class="study-companion" id="studyCompanion" src="assets/cat-speaker.jpg" alt="戴耳机陪读的猫咪">
+          <div class="companion-bubble" id="companionBubble">先猜一猜，再翻卡喵！</div>
+        </div>
+      </section>
+
+      <section class="view" id="libraryView" data-view-panel="library">
+        <div class="inner-head"><div><p class="eyebrow">WORD COLLECTION</p><h1>我的六级词库</h1><p>每一个认识的单词，都是你努力留下的脚印。</p></div><img src="assets/cat-focus.jpg" alt="专注模式的猫咪"></div>
+        <div class="library-toolbar card-surface">
+          <label class="search-box"><svg><use href="#i-search"/></svg><input id="wordSearch" type="search" placeholder="搜索单词或中文释义…"></label>
+          <div class="filter-chips" id="filterChips"><button class="active" data-filter="all">全部</button><button data-filter="new">未学习</button><button data-filter="learning">学习中</button><button data-filter="mastered">已掌握</button></div>
+          <span class="library-count">共 <b id="libraryCount">0</b> 词</span>
+        </div>
+        <div class="word-list" id="wordList"></div>
+        <button class="load-more-btn" id="loadMoreWords" type="button">继续加载</button>
+      </section>
+
+      <section class="view" id="statsView" data-view-panel="stats">
+        <div class="inner-head stats-head"><div><p class="eyebrow">YOUR PROGRESS</p><h1>学习统计</h1><p>看得见的进步，会让坚持变得更简单。</p></div><img src="assets/cat-orange.jpg" alt="戴橘子帽的猫咪"></div>
+        <div class="stats-cards">
+          <article class="stat-tile"><span class="stat-icon coral">Aa</span><div><b id="statLearned">0</b><small>累计学习</small></div><em>个单词</em></article>
+          <article class="stat-tile"><span class="stat-icon blue">✓</span><div><b id="statMastered">0</b><small>牢固掌握</small></div><em>复习 4+ 次</em></article>
+          <article class="stat-tile"><span class="stat-icon yellow">↗</span><div><b id="statReviews">0</b><small>累计复习</small></div><em>次回忆</em></article>
+          <article class="stat-tile"><span class="stat-icon green">⚑</span><div><b id="statStreak">0</b><small>连续打卡</small></div><em>天</em></article>
+        </div>
+        <div class="stats-layout">
+          <article class="card-surface activity-card"><div class="section-title"><span><i class="title-dot coral"></i><b>最近 14 天</b></span><small>每日完成单词数</small></div><div class="bar-chart" id="barChart"></div></article>
+          <article class="card-surface mastery-card"><div class="section-title"><span><i class="title-dot blue"></i><b>掌握情况</b></span></div><div class="donut" id="masteryDonut"><div><b id="donutPercent">0%</b><small>词库进度</small></div></div><ul><li><i class="green-dot"></i>已掌握 <b id="legendMastered">0</b></li><li><i class="blue-dot"></i>学习中 <b id="legendLearning">0</b></li><li><i class="gray-dot"></i>未学习 <b id="legendNew">0</b></li></ul></article>
+          <article class="card-surface schedule-card"><div class="section-title"><span><i class="title-dot yellow"></i><b>接下来要复习</b></span></div><div id="scheduleList"></div></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="settingsDialog" class="settings-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><span>ฅ</span><h2>学习设置</h2></div><button value="cancel" aria-label="关闭"><svg><use href="#i-close"/></svg></button></div>
+      <label>每日新词目标<small>建议 10～20 个，轻松坚持更重要</small><div class="stepper"><button type="button" id="goalMinus">−</button><b id="goalValue">10</b><button type="button" id="goalPlus">＋</button></div></label>
+      <div class="interval-info"><b>当前复习节奏</b><p><span>初学</span><i></i><span>1天</span><i></i><span>2天</span><i></i><span>4天</span><i></i><span>7天</span><i></i><span>15天</span><i></i><span>30天</span></p></div>
+      <button class="primary-btn save-settings" id="saveSettingsBtn" value="default">保存设置</button>
+      <button type="button" class="danger-link" id="resetBtn">清空全部学习记录</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><p>已保存</p></div>
+  <script src="data/cet6-vocabulary.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
