@@ -1,6 +1,6 @@
 # 猫猫六级
 
-一个以橘猫为主题的六级词汇学习网页。直接双击 `https://flyinghusky.github.io/MEOW-WORDS/` 即可使用，不需要安装依赖或启动服务器。
+一个以橘猫为主题的六级词汇学习网页。直接打开 `https://flyinghusky.github.io/MEOW-WORDS/` 即可使用，不需要安装依赖或启动服务器。
 
 ## 功能
 
